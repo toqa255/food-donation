@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Food Box Map - It3am</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 600px;
+      width: 100%;
+      border-radius: 0.5rem;
+    }
+    .legend {
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .legend-item {
+      margin: 5px 0;
+      display: flex;
+      align-items: center;
+    }
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      margin-left: 8px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <!-- Header -->
+  <header class="bg-green-50 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <img src="images/FoodCharityLogo.png" class="w-12 h-12 rounded-full object-cover"/>
+      <h1 class="text-2xl font-bold text-green-600">It3am</h1>
+      <nav class="space-x-4">
+        <a href="index.html" class="text-gray-700 hover:text-green-600">Home</a>
+        <a href="donate.html" class="text-gray-700 hover:text-green-600">Donate Food</a>
+        <a href="map.html" class="text-gray-700 hover:text-green-600">Food Box Map</a>
+        <a href="notifications.html" class="text-gray-700 hover:text-green-600">Notifications</a>
+        <a href="login.html" class="text-gray-700 hover:text-green-600">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto py-12 px-4">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-green-700 mb-4">Food Box Map</h2>
+      <p class="text-gray-600">Find the nearest food box and check its status</p>
+    </div>
+
+    <!-- Map -->
+    <div class="grid md:grid-cols-4 gap-8">
+      <div class="md:col-span-3">
+        <div id="map"></div>
+      </div>
+      <div class="space-y-6">
+        <!-- Filter Boxes -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h3 class="text-lg font-semibold text-green-700 mb-4">Filter Boxes</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="checkbox" checked class="form-checkbox text-green-600">
+              <span class="mr-2">Empty Boxes</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" checked class="form-checkbox text-yellow-600">
+              <span class="mr-2">Almost Full Boxes</span>
+            </label>
+            <label class="flex items-center">
+              <input type="checkbox" checked class="form-checkbox text-red-600">
+              <span class="mr-2">Full Boxes</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Box Info -->
+        <div id="boxInfo" class="bg-white p-6 rounded-lg shadow-md hidden">
+          <h3 class="text-lg font-semibold text-green-700 mb-4">Box Information</h3>
+          <div class="space-y-2">
+            <p><strong>Location:</strong> <span id="boxLocation"></span></p>
+            <p><strong>Status:</strong> <span id="boxStatus"></span></p>
+            <p><strong>Last Update:</strong> <span id="lastUpdate"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8 mt-12">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <p>© 2025 It3am - All rights reserved</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script>
+    // Initialize the map centered on Jordan
+    const map = L.map('map').setView([31.9539, 35.9106], 9);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Custom icons for different box states
+    const boxIcons = {
+      empty: L.divIcon({
+        className: 'custom-div-icon',
+        html: '<div style="background-color: #10B981; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
+        iconSize: [20, 20]
+      }),
+      almostFull: L.divIcon({
+        className: 'custom-div-icon',
+        html: '<div style="background-color: #FBBF24; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
+        iconSize: [20, 20]
+      }),
+      full: L.divIcon({
+        className: 'custom-div-icon',
+        html: '<div style="background-color: #EF4444; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>',
+        iconSize: [20, 20]
+      })
+    };
+
+    // Sample data for food collection boxes
+    const boxes = [
+      { lat: 31.9539, lng: 35.9106, status: 'empty', location: 'Amman - Abdali' },
+      { lat: 31.9000, lng: 35.9500, status: 'almostFull', location: 'Amman - Jubaiha' },
+      { lat: 31.8500, lng: 35.8800, status: 'full', location: 'Amman - Sweileh' },
+      { lat: 32.0500, lng: 36.0900, status: 'empty', location: 'Zarqa - Downtown' },
+      { lat: 32.3333, lng: 36.2333, status: 'almostFull', location: 'Mafraq' },
+      { lat: 31.7167, lng: 35.8167, status: 'empty', location: 'Salt' },
+      { lat: 31.1833, lng: 35.7000, status: 'almostFull', location: 'Karak' },
+      { lat: 29.5333, lng: 35.0000, status: 'empty', location: 'Aqaba' }
+    ];
+
+    // Add markers to the map
+    boxes.forEach(box => {
+      const marker = L.marker([box.lat, box.lng], { icon: boxIcons[box.status] })
+        .addTo(map)
+        .on('click', () => showBoxInfo(box));
+    });
+
+    // Show box information when marker is clicked
+    function showBoxInfo(box) {
+      const boxInfo = document.getElementById('boxInfo');
+      const boxLocation = document.getElementById('boxLocation');
+      const boxStatus = document.getElementById('boxStatus');
+      const lastUpdate = document.getElementById('lastUpdate');
+
+      boxInfo.classList.remove('hidden');
+      boxLocation.textContent = box.location;
+      boxStatus.textContent = getStatusInEnglish(box.status);
+      lastUpdate.textContent = new Date().toLocaleString('en-US');
+    }
+
+    function getStatusInEnglish(status) {
+      switch(status) {
+        case 'empty': return 'Empty';
+        case 'almostFull': return 'Almost Full';
+        case 'full': return 'Full';
+        default: return '';
+      }
+    }
+
+    // Add legend
+    const legend = L.control({ position: 'bottomright' });
+    legend.onAdd = function(map) {
+      const div = L.DomUtil.create('div', 'legend');
+      div.innerHTML = `
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #10B981;"></div>
+          <span>Empty Box</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #FBBF24;"></div>
+          <span>Almost Full Box</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background-color: #EF4444;"></div>
+          <span>Full Box</span>
+        </div>
+      `;
+      return div;
+    };
+    legend.addTo(map);
+  </script>
+</body>
+</html>

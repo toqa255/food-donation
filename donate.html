@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donate Food - It3am</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <!-- Header -->
+  <header class="bg-green-50 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+  <img src="images/FoodCharityLogo.png" class="w-12 h-12 rounded-full object-cover"/>
+      <h1 class="text-2xl font-bold text-green-600">It3am</h1>
+     <nav class="space-x-4">
+        <a href="index.html" class="text-gray-700 hover:text-green-600">Home</a>
+        <a href="donate.html" class="text-gray-700 hover:text-green-600">Donate Food</a>
+        <a href="map.html" class="text-gray-700 hover:text-green-600">Food Box Map</a>
+        <a href="notifications.html" class="text-gray-700 hover:text-green-600">Notifications</a>
+        <a href="login.html" class="text-gray-700 hover:text-green-600">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Donation Form -->
+  <main class="max-w-2xl mx-auto py-12 px-4">
+    <h2 class="text-3xl font-bold text-green-700 mb-8 text-center">Donate Food</h2>
+    
+    <form id="donationForm" class="space-y-6 bg-white p-8 rounded-lg shadow-md">
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2" for="foodType">Food Type</label>
+        <select id="foodType" class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400 focus:border-green-400" required>
+          <option value="">Select food type</option>
+          <option value="cooked">Cooked Food</option>
+          <option value="raw">Uncooked Food Items</option>
+          <option value="canned">Canned Food</option>
+          <option value="bakery">Bakery</option>
+          <option value="fruits">Fruits and Vegetables</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2" for="quantity">Quantity</label>
+        <div class="flex items-center gap-4">
+          <input type="number" id="quantity" min="1" required
+            class="flex-1 p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400 focus:border-green-400">
+          <select id="unit" class="p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400 focus:border-green-400">
+            <option value="kg">Kilogram</option>
+            <option value="items">Item</option>
+            <option value="packages">Package</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2" for="expiryDate">Expiration Date</label>
+        <input type="date" id="expiryDate" required
+          class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400 focus:border-green-400">
+      </div>
+
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2" for="description">Additional Description (Optional)</label>
+        <textarea id="description" rows="3"
+          class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-green-400 focus:border-green-400"
+          placeholder="Any additional information about the food..."></textarea>
+      </div>
+
+      <button type="submit"
+        class="w-full bg-green-600 text-white py-3 px-6 rounded hover:bg-green-700 transition focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+        Confirm Donation
+      </button>
+    </form>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8 mt-12">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <p>© 2025 It3am - All rights reserved</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('donationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get form data
+      const formData = {
+        foodType: document.getElementById('foodType').value,
+        quantity: document.getElementById('quantity').value,
+        unit: document.getElementById('unit').value,
+        expiryDate: document.getElementById('expiryDate').value,
+        description: document.getElementById('description').value
+      };
+
+      // Here you would typically send this data to your backend
+      console.log('Form submitted:', formData);
+      alert('Thank you for your donation! You will be redirected to the food box map to choose the nearest box.');
+      window.location.href = 'map.html';
+    });
+  </script>
+</body>
+</html>
